@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pal Grocery - A Premium AI-Powered Smart Grocery & Retail Management Platform for your modern Kirana Store. Order fresh groceries and access automated billing.">
+  <meta name="keywords" content="Kirana Store, Online Grocery, POS Billing, Inventory Management, India, Organic Fruits, Smart Grocery, AI Assistant">
+  <meta name="author" content="Pal Grocery Team">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pal Grocery - Premium Smart Kirana Store Platform">
+  <meta property="og:description" content="A complete digital ecosystem for modern retail featuring storefront shopping, billing terminal, and analytics.">
+  
+  <title>Pal Grocery | Premium AI-Powered Kirana Store</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16a34a">
+  
+  <!-- Core Design CSS -->
+  <link rel="stylesheet" href="assets/css/style.css?v=2">
+</head>
+<body>
+
+  <!--  Premium Application Splash Screen -->
+  <div id="app-splash-screen" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-base); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; gap: var(--spacing-md);">
+    <div class="splash-logo" style="display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); transform: translateY(-20px); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
+      <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); color: white; margin-bottom: 8px;">
+        <i data-lucide="shopping-bag" style="width: 36px; height: 36px; stroke-width: 2.5px;"></i>
+      </div>
+      <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); letter-spacing: -1px; margin-bottom: 2px;">Pal Grocery</h1>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Smart Kirana Store</span>
+    </div>
+    
+    <!-- Spinner loader -->
+    <div style="width: 32px; height: 32px; border: 3px solid var(--border-color); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 10px;"></div>
+  </div>
+
+  <!--  Main Navigation Header -->
+  <header class="app-header">
+    <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    <div class="container nav-wrapper">
+      <a href="#" class="logo" id="header-logo-link">
+        <i data-lucide="shopping-bag" style="stroke-width: 2.5px;"></i>
+        <span data-t="shop_name">Pal Grocery</span>
+      </a>
+      
+      <!-- Mobile Menu Toggle Button -->
+      <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu">
+        <i data-lucide="menu"></i>
+      </button>
+      
+      <!-- Storefront Navigation Links -->
+      <nav class="nav-links" id="storefront-nav">
+        <a href="#" class="nav-link active" data-target="home" id="nav-link-home" data-t="home">Home</a>
+        <a href="#shop" class="nav-link" data-target="shop" id="nav-link-shop" data-t="catalog">Shop</a>
+        <a href="#lassi" class="nav-link" data-target="lassi" id="nav-link-lassi" data-t="lassi">Lassi</a>
+        <a href="#tracking" class="nav-link" data-target="tracking" id="nav-link-tracking">Track Order</a>
+        <a href="#about" class="nav-link" data-target="about" id="nav-link-about" data-t="about">Our Story</a>
+        <a href="#contact" class="nav-link" data-target="contact" id="nav-link-contact" data-t="contact">Contact</a>
+      </nav>
+      
+      <!-- Action utilities (Theme switch, Cart button) -->
+      <div class="nav-actions">
+
+        <button class="theme-toggle-btn" id="lang-toggle-button" aria-label="Toggle language" title="Switch Language / भाषा बदलें" onclick="window.toggleLanguage()">
+          <span style="font-size: 0.82rem; font-weight: 800;">हिंदी</span>
+        </button>
+
+        <button class="theme-toggle-btn" id="theme-toggle-button" aria-label="Toggle light and dark theme">
+          <i data-lucide="moon" id="theme-toggle-icon"></i>
+        </button>
+        
+        <button class="cart-icon-btn" id="cart-drawer-toggle" aria-label="Open Cart Drawer">
+          <i data-lucide="shopping-cart"></i>
+          <span class="cart-badge" id="cart-item-count">0</span>
+        </button>
+
+        <!-- Mock Customer Profile dropdown trigger -->
+        <button class="profile-btn" id="profile-dropdown-btn" data-target="profile">
+          <div class="profile-avatar">V</div>
+          <span style="font-size: 0.85rem; font-weight: 600; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Vishal</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!--  Main Display Viewport (Dynamically Injected Router Pages) -->
+  <main class="main-content" id="app-viewport">
+    <!-- Dynamic JS views (Home, Catalog, Checkout, Admin Dashboard) load here -->
+    <div class="container" style="padding: 4rem 0; text-align: center;">
+      <div class="skeleton" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1.5rem auto;"></div>
+      <div class="skeleton" style="width: 250px; height: 24px; margin: 0 auto 1rem auto; border-radius: 4px;"></div>
+      <div class="skeleton" style="width: 180px; height: 16px; margin: 0 auto; border-radius: 4px;"></div>
+    </div>
+  </main>
+
+  <!--  Side Drawer Cart -->
+  <div class="cart-drawer-overlay" id="cart-overlay"></div>
+  <div class="cart-drawer" id="cart-drawer-container">
+    <div class="cart-drawer-header">
+      <span class="cart-drawer-title">Shopping Basket</span>
+      <button class="cart-drawer-close" id="cart-drawer-close" aria-label="Close Shopping Basket">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    
+    <div class="cart-drawer-items" id="cart-drawer-items-list">
+      <!-- Cart items injected via JS -->
+      <div style="text-align: center; padding: var(--spacing-xl) var(--spacing-md); color: var(--text-muted);">
+        <i data-lucide="shopping-bag" style="width: 48px; height: 48px; stroke-width: 1.5; margin-bottom: var(--spacing-md);"></i>
+        <p>Your basket is empty</p>
+      </div>
+    </div>
+    
+    <div class="cart-drawer-footer">
+      <div class="cart-summary-row">
+        <span>Subtotal</span>
+        <span id="cart-summary-subtotal">₹0.00</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Delivery Fee</span>
+        <span id="cart-summary-delivery" style="color: var(--success); font-weight: 700;">FREE</span>
+      </div>
+      <div class="cart-summary-total">
+        <span>Total Payable</span>
+        <span id="cart-summary-total">₹0.00</span>
+      </div>
+      
+      <button class="btn btn-primary" id="checkout-drawer-btn" style="width: 100%; margin-top: var(--spacing-md);">
+        Proceed to Checkout
+        <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!--  Floating Customer AI Assistant Chat -->
+  <div class="ai-chat-bubble" id="ai-chat-trigger" aria-label="Ask AI Assistant">
+    <i data-lucide="sparkles"></i>
+  </div>
+  <div class="ai-chat-window" id="ai-chat-window-container">
+    <div class="ai-chat-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <i data-lucide="bot"></i>
+        <div>
+          <h4 style="font-size: 0.9rem; font-weight: 800; line-height: 1.1;">Kirana AI Assistant</h4>
+          <span style="font-size: 0.65rem; opacity: 0.85;">Ask me to add items to cart!</span>
+        </div>
+      </div>
+      <button id="ai-chat-close" style="color: white;"><i data-lucide="x"></i></button>
+    </div>
+    
+    <div class="ai-chat-messages" id="ai-chat-messages-container">
+      <div class="chat-msg bot">
+        Namaste! I am your smart Kirana Assistant. You can ask me questions about products or type actions like:
+        <br><br>
+        • "Show organic items"<br>
+        • "Add 2 Shimla apples to my basket"<br>
+        • "Suggest a good snack for tea"<br>
+        • "Is there a discount running?"
+      </div>
+    </div>
+    
+    <!-- Quick prompt buttons -->
+    <div class="ai-chat-prompts">
+      <button class="ai-chat-prompt-btn" data-query="Add milk to cart">Add Milk</button>
+      <button class="ai-chat-prompt-btn" data-query="Show fruits">Show Fruits</button>
+      <button class="ai-chat-prompt-btn" data-query="Any active offers?">Any Offers?</button>
+      <button class="ai-chat-prompt-btn" data-query="Check my loyalty points">Loyalty Points</button>
+    </div>
+    
+    <div class="ai-chat-input-row">
+      <input type="text" class="ai-chat-input" id="ai-chat-text-input" placeholder="Type message... (e.g. add 3 apples)" aria-label="Type message for AI">
+      <button class="ai-chat-send" id="ai-chat-send-btn" aria-label="Send message to AI">
+        <i data-lucide="send"></i>
+      </button>
+    </div>
+  </div>
+
+  <!--  Global Dialog Modal Container -->
+  <div class="modal-overlay" id="global-modal-overlay">
+    <div class="modal-box" id="global-modal-box">
+      <button class="modal-close" id="global-modal-close" aria-label="Close Dialog"><i data-lucide="x"></i></button>
+      <div id="global-modal-content">
+        <!-- Dynmically loaded content inside model (UPI QR, Invoice, Success screen) -->
+      </div>
+    </div>
+  </div>
+
+  <!--  Site Footer (Ultra-Premium Redesign V3) -->
+  <footer class="app-footer" id="main-site-footer">
+    <!-- Top Trust Feature Strip -->
+    <div class="footer-trust-strip">
+      <div class="container">
+        <div class="footer-trust-grid">
+          <div class="footer-trust-item">
+            <div class="footer-trust-icon" style="background: rgba(16, 185, 129, 0.14); color: var(--primary);">
+              <i data-lucide="truck"></i>
+            </div>
+            <div>
+              <strong>30-Min Fast Delivery</strong>
+              <span>Free local home delivery within 3 KM</span>
+            </div>
+          </div>
+
+          <div class="footer-trust-item">
+            <div class="footer-trust-icon" style="background: rgba(245, 158, 11, 0.14); color: #d97706;">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <div>
+              <strong>100% Satvik Purity</strong>
+              <span>Pure farm milk, dahi & unadulterated kirana</span>
+            </div>
+          </div>
+
+          <div class="footer-trust-item">
+            <div class="footer-trust-icon" style="background: rgba(14, 165, 233, 0.14); color: #0ea5e9;">
+              <i data-lucide="qr-code"></i>
+            </div>
+            <div>
+              <strong>Easy UPI & COD</strong>
+              <span>GPay, PhonePe, Paytm, BHIM & Cash on Delivery</span>
+            </div>
+          </div>
+
+          <div class="footer-trust-item">
+            <div class="footer-trust-icon" style="background: rgba(168, 85, 247, 0.14); color: #a855f7;">
+              <i data-lucide="headphones"></i>
+            </div>
+            <div>
+              <strong>7 AM - 10 PM Support</strong>
+              <span>Direct store owner care & WhatsApp order</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top: 3rem; padding-bottom: 2rem;">
+      <div class="footer-grid">
+        <!-- Col 1: Brand & Status -->
+        <div class="footer-column footer-brand-col">
+          <div class="footer-brand-header">
+            <div class="footer-brand-logo-icon">
+              <i data-lucide="shopping-bag"></i>
+            </div>
+            <h3 class="footer-brand-name">Pal Grocery</h3>
+          </div>
+          <p class="footer-brand-desc">
+            Devari Bazar's most trusted Kirana store since 2004. Combining 20+ years of unshakeable purity with modern 30-minute online delivery.
+          </p>
+
+          <div class="footer-store-status">
+            <span class="status-pulse-dot"></span>
+            <strong>Store Status:</strong> <span style="color: #10b981; font-weight: 800;">Open Today (7 AM - 10 PM)</span>
+          </div>
+
+          <div class="footer-social-links">
+            <a href="https://wa.me/919415552992" target="_blank" aria-label="WhatsApp" title="Chat on WhatsApp" class="social-icon-btn">
+              <i data-lucide="message-circle"></i>
+            </a>
+            <a href="tel:+919415552992" aria-label="Call Store" title="Call Store" class="social-icon-btn">
+              <i data-lucide="phone-call"></i>
+            </a>
+            <a href="#about" aria-label="Store Location" title="Locate Store" class="social-icon-btn">
+              <i data-lucide="map-pin"></i>
+            </a>
+            <a href="#lassi" aria-label="Lassi Lounge" title="Artisanal Lassi" class="social-icon-btn">
+              <i data-lucide="sparkles"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Col 2: Navigation Links -->
+        <div class="footer-column">
+          <h4 class="footer-col-title"><i data-lucide="compass"></i> Quick Links</h4>
+          <ul class="footer-links-list">
+            <li><a href="#home"><i data-lucide="chevron-right"></i> Home Storefront</a></li>
+            <li><a href="#shop"><i data-lucide="chevron-right"></i> Full Grocery Catalog</a></li>
+            <li><a href="#lassi"><i data-lucide="chevron-right"></i> Royal Desi Lassi Lounge</a></li>
+            <li><a href="#about"><i data-lucide="chevron-right"></i> Our 20-Year Story & Founder</a></li>
+            <li><a href="#contact"><i data-lucide="chevron-right"></i> Contact & Help Support</a></li>
+            <li><a href="javascript:void(0)" onclick="window.openOrderByTextModal()"><i data-lucide="chevron-right"></i> Order by Text (Parchi)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Popular Categories -->
+        <div class="footer-column">
+          <h4 class="footer-col-title"><i data-lucide="grid"></i> Shop Categories</h4>
+          <ul class="footer-links-list">
+            <li><a href="#shop" onclick="window.selectCatalogCategory && window.selectCatalogCategory('Lassi')"><i data-lucide="chevron-right"></i> Fresh Milk & Dairy</a></li>
+            <li><a href="#shop" onclick="window.selectCatalogCategory && window.selectCatalogCategory('Groceries')"><i data-lucide="chevron-right"></i> Atta, Rice, Dal & Oil</a></li>
+            <li><a href="#shop" onclick="window.selectCatalogCategory && window.selectCatalogCategory('Cold Drinks')"><i data-lucide="chevron-right"></i> Cold Drinks & Beverages</a></li>
+            <li><a href="#shop" onclick="window.selectCatalogCategory && window.selectCatalogCategory('Snacks & Munchies')"><i data-lucide="chevron-right"></i> Biscuits, Tea & Snacks</a></li>
+            <li><a href="#shop" onclick="window.selectCatalogCategory && window.selectCatalogCategory('Daily Essentials')"><i data-lucide="chevron-right"></i> Daily Spices & Essentials</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Store Info & Address -->
+        <div class="footer-column">
+          <h4 class="footer-col-title"><i data-lucide="store"></i> Store Information</h4>
+          <div class="footer-info-cards">
+            <div class="footer-info-card">
+              <i data-lucide="map-pin" style="color: var(--primary);"></i>
+              <div>
+                <strong>Devari Bazaar, Haliya</strong>
+                <span style="display: block; font-size: 0.8rem; color: var(--text-muted);">Mirzapur, UP - 231211</span>
+              </div>
+            </div>
+
+            <div class="footer-info-card">
+              <i data-lucide="phone-call" style="color: #0ea5e9;"></i>
+              <div>
+                <strong>Customer Helpline</strong>
+                <a href="tel:+919415552992" style="display: block; font-size: 0.82rem; color: var(--primary); font-weight: 700;">+91 94155 52992</a>
+              </div>
+            </div>
+
+            <div class="footer-info-card">
+              <i data-lucide="clock" style="color: #d97706;"></i>
+              <div>
+                <strong>Order Timing Notice</strong>
+                <span style="display: block; font-size: 0.78rem; color: var(--text-muted);">Items ready in 30 mins after order confirmation.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="footer-copy-text">
+          © 2026 <strong>Pal General Store</strong>. Devari Bazar's Trusted Kirana since 2004. Handcrafted with Vanilla JS/CSS.
+        </div>
+
+        <div class="footer-payment-badges">
+          <span class="pay-chip"><i data-lucide="check" style="width:12px;"></i> UPI QR</span>
+          <span class="pay-chip"><i data-lucide="check" style="width:12px;"></i> GPay</span>
+          <span class="pay-chip"><i data-lucide="check" style="width:12px;"></i> PhonePe</span>
+          <span class="pay-chip"><i data-lucide="check" style="width:12px;"></i> Paytm</span>
+          <span class="pay-chip"><i data-lucide="check" style="width:12px;"></i> COD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!--  Core Code Injections -->
+  <!-- Scroll to Top Floating Action Button -->
+  <button class="scroll-to-top-fab" id="scroll-to-top-fab" onclick="window.scrollTo({top:0, behavior:'smooth'})" aria-label="Scroll to top" title="Scroll to top">
+    <i data-lucide="arrow-up" style="width: 22px; height: 22px;"></i>
+  </button>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!--  Database Layer (PHP MySQL API) -->
+  <script src="assets/js/db.js"></script>
+  
+  <!-- Internal modules -->
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/ai-assistant.js"></script>
+  <script src="assets/js/admin.js"></script>
+  <script src="assets/js/pos.js"></script>
+  <script src="assets/js/home-view.js"></script>
+  <script src="assets/js/catalog-view.js"></script>
+  <script src="assets/js/about-view.js"></script>
+  <script src="assets/js/contact-view.js"></script>
+  <script src="assets/js/profile-view.js"></script>
+  <script src="assets/js/tracker-view.js"></script>
+  <script src="assets/js/tracking-view.js"></script>
+  <script src="assets/js/checkout-view.js"></script>
+  <script src="assets/js/login-view.js"></script>
+  <script src="assets/js/lassi-view.js"></script>
+  <script src="assets/js/parchi-view.js"></script>
+  <script src="assets/js/arcade-engine.js"></script>
+  
+  <!-- Orchestrator / Application entrypoint -->
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
