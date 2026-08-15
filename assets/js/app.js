@@ -83,14 +83,6 @@ window.translatePage = () => {
   // Update header titles and button state labels
   const logoSpan = document.querySelector(".logo span");
   if (logoSpan) logoSpan.textContent = window.t("shop_name");
-
-  const adminToggle = document.getElementById("admin-mode-toggle");
-  if (adminToggle) {
-    const textSpan = adminToggle.querySelector("span");
-    if (textSpan) {
-      textSpan.textContent = window.state.currentView === "admin" ? window.t("home") : window.t("admin_portal");
-    }
-  }
 };
 
 window.toggleLanguage = () => {
@@ -227,7 +219,49 @@ window.state = {
 };
 
 // 2. Global Document Event Bindings
-document.addEventListener("DOMContentLoaded", async () => {
+async function initAppMain() {
+  if (window.IS_ADMIN_STANDALONE) {
+    // 1. Immediate UI Render (Remove spinner instantly)
+    if (window.adminDashboard && window.adminDashboard.renderAdminShell) {
+      window.adminDashboard.renderAdminShell();
+      const urlParams = new URLSearchParams(window.location.search);
+      const tab = urlParams.get('tab');
+      if (tab && window.adminDashboard.switchTab) {
+        window.adminDashboard.switchTab(tab);
+      }
+    }
+    // 2. Load DB Data asynchronously in background
+    if (window.DB) {
+      try {
+        await window.DB.init();
+        const firebaseProducts = await window.DB.loadProducts();
+        if (firebaseProducts && firebaseProducts.length > 0) {
+          window.state.inventory = firebaseProducts;
+        }
+        const firebaseOffers = await window.DB.loadOffers();
+        if (firebaseOffers && firebaseOffers.length > 0) {
+          window.state.offers = firebaseOffers;
+        }
+        const settings = await window.DB.loadSettings();
+        if (settings) {
+          Object.assign(window.SHOP_CONFIG, settings);
+        }
+        const dbOrders = await window.DB.loadOrders();
+        if (dbOrders && dbOrders.length > 0) {
+          window.state.orders = dbOrders;
+          window.state.ordersCount = dbOrders.length;
+          window.state.totalSalesRevenue = dbOrders.reduce((sum, o) => sum + (o.status !== 'Cancelled' ? o.total : 0), 0);
+        }
+        if (window.adminDashboard && window.adminDashboard.renderActiveAdminPane) {
+          window.adminDashboard.renderActiveAdminPane();
+        }
+      } catch (e) {
+        console.warn("DB load error in admin:", e);
+      }
+    }
+    return;
+  }
+
   //  Firebase initialize karo (pehle!)
   if (window.DB) {
     const firebaseReady = window.DB.init();
@@ -322,7 +356,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       splash.style.visibility = "hidden";
     }, 500);
   }
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initAppMain);
+} else {
+  initAppMain();
+}
 
 // --- SPA Router ---
 function initAppRouter() {
@@ -444,11 +484,6 @@ function updateHeaderAuthUI() {
       <div class="profile-avatar">${firstLetter}</div>
       <span style="font-size: 0.85rem; font-weight: 600; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${window.state.user.name}</span>
     `;
-  } else if (window.state.adminUser) {
-    profileBtn.innerHTML = `
-      <div class="profile-avatar" style="background: var(--secondary); color: white;"><i data-lucide="shield" style="width: 14px; height: 14px;"></i></div>
-      <span style="font-size: 0.85rem; font-weight: 600; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Admin</span>
-    `;
   } else {
     profileBtn.innerHTML = `
       <div class="profile-avatar" style="background: var(--bg-surface-hover); color: var(--text-muted);"><i data-lucide="user" style="width: 14px; height: 14px;"></i></div>
@@ -465,6 +500,7 @@ window.performLogout = () => {
   window.state.adminUser = null;
   localStorage.removeItem("palbasket_user");
   localStorage.removeItem("palbasket_admin");
+  localStorage.removeItem("palbasket_admin_token");
 
   document.getElementById("storefront-nav").style.display = "";
   document.getElementById("cart-drawer-toggle").style.display = "";
@@ -498,17 +534,9 @@ window.addEventListener("hashchange", () => {
 
 function navigateView(viewName, arg = null, updateHash = true) {
   // --- Route Protection ---
-  if (viewName === "admin") {
-    if (!window.state.adminUser) {
-      // Allow seamless login fallback for owner
-      window.state.adminUser = {
-        name: "Ramlallu Pal (Owner)",
-        email: "admin@palgrocery.in",
-        phone: "9415552992",
-        role: "admin"
-      };
-      localStorage.setItem("palbasket_admin", JSON.stringify(window.state.adminUser));
-    }
+  if (viewName === "admin" || viewName === "admin-login") {
+    window.location.href = "admin/login.php";
+    return;
   } else if (viewName === "checkout" || viewName === "profile" || viewName === "tracker" || viewName === "parchi") {
     if (!window.state.user) {
       showToast("Authentication required to continue.", "info");

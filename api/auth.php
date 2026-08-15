@@ -91,6 +91,7 @@ if ($method === 'POST') {
     // ─── ADMIN LOGIN ──────────────────────────────────────
     if ($action === 'admin_login') {
         checkRateLimit($conn, $ipAddress);
+        usleep(250000); // 250ms anti-timing attack delay
 
         $username = trim($input['username'] ?? '');
         $password = trim($input['password'] ?? '');
@@ -106,20 +107,35 @@ if ($method === 'POST') {
         $storedUser = ($resUser && $row = $resUser->fetch_assoc()) ? $row['setting_value'] : '9415552992';
         $storedHash = ($resHash && $row = $resHash->fetch_assoc()) ? $row['setting_value'] : '';
 
-        // Allow login by Username '9415552992', 'admin', or 'admin@palgrocery.in'
+        // Allow login by Username or stored admin username
         $isUserValid = (strtolower($username) === strtolower($storedUser) || $username === 'admin' || $username === '9415552992' || $username === 'admin@palgrocery.in');
-        $isPassValid = password_verify($password, $storedHash) || password_verify($password, password_hash('Pal@9415552992', PASSWORD_BCRYPT)) || $password === 'Pal@9415552992' || $password === 'admin123';
+        
+        $isPassValid = false;
+        if (!empty($storedHash)) {
+            $isPassValid = password_verify($password, $storedHash);
+        } else {
+            $isPassValid = password_verify($password, password_hash('Pal@9415552992', PASSWORD_BCRYPT));
+        }
 
         if ($isUserValid && $isPassValid) {
             clearAttempts($conn, $ipAddress);
+
+            // Generate secure admin session token
+            $sessionToken = bin2hex(random_bytes(32));
+            $stmtToken = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('admin_session_token', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+            $stmtToken->bind_param("ss", $sessionToken, $sessionToken);
+            $stmtToken->execute();
+
             jsonResponse([
                 'success' => true,
                 'message' => 'Admin Security Verification Passed!',
+                'token' => $sessionToken,
                 'user' => [
                     'id' => 999,
                     'name' => 'Ramlallu Pal (Owner)',
                     'phone' => '9415552992',
-                    'role' => 'admin'
+                    'role' => 'admin',
+                    'token' => $sessionToken
                 ]
             ]);
         } else {
@@ -130,6 +146,8 @@ if ($method === 'POST') {
 
     // ─── CHANGE ADMIN PASSWORD & USERNAME ────────────────
     if ($action === 'change_admin_credentials') {
+        verifyAdminAuthToken($conn);
+
         $oldPassword = trim($input['oldPassword'] ?? '');
         $newUsername = trim($input['newUsername'] ?? '');
         $newPassword = trim($input['newPassword'] ?? '');
@@ -146,7 +164,7 @@ if ($method === 'POST') {
         $resHash = $conn->query("SELECT setting_value FROM settings WHERE setting_key = 'admin_password_hash'");
         $storedHash = ($resHash && $row = $resHash->fetch_assoc()) ? $row['setting_value'] : '';
 
-        if (!password_verify($oldPassword, $storedHash) && $oldPassword !== 'Pal@9415552992' && $oldPassword !== 'admin123') {
+        if (!password_verify($oldPassword, $storedHash)) {
             errorResponse('Incorrect old password! Verification failed.', 403);
         }
 
@@ -161,9 +179,16 @@ if ($method === 'POST') {
         $stmtHash->bind_param("ss", $newHash, $newHash);
         $stmtHash->execute();
 
+        // Refresh session token
+        $newSessionToken = bin2hex(random_bytes(32));
+        $stmtToken = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES ('admin_session_token', ?) ON DUPLICATE KEY UPDATE setting_value = ?");
+        $stmtToken->bind_param("ss", $newSessionToken, $newSessionToken);
+        $stmtToken->execute();
+
         jsonResponse([
             'success' => true,
-            'message' => 'Admin Username & Password updated successfully in Database!'
+            'message' => 'Admin Username & Password updated successfully in Database!',
+            'token' => $newSessionToken
         ]);
     }
 
@@ -225,7 +250,7 @@ if ($method === 'POST') {
         }
 
         $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password_hash']) || $password === 'password123') {
+        if (password_verify($password, $user['password_hash'])) {
             jsonResponse([
                 'success' => true,
                 'user' => [

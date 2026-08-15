@@ -1,0 +1,27 @@
+# ============================================================
+#   Pal Grocery — Production Server Security Configuration (.htaccess)
+# ============================================================
+
+# 1. Prevent Directory Browsing
+Options -Indexes
+
+# 2. Set Production Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 3. Block Direct Access to Sensitive Files (.sql, .env, .git, .md)
+<FilesMatch "\.(sql|env|git|md|log|sh|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 4. Protect Database Directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^admin/?$ admin/index.php [L]
+</IfModule>

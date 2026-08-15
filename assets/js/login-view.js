@@ -128,12 +128,6 @@ function renderLoginPage(viewport, redirectData = null) {
           </div>
         </div>
         
-        <!-- Store Owner Redirection Footer Link -->
-        <div style="margin-top: var(--spacing-lg); border-top: 1.5px dashed var(--border-color); padding-top: var(--spacing-md); text-align: center;">
-          <a href="#admin-login" onclick="navigateView('admin-login')" style="font-size: 0.8rem; color: var(--primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-            <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Store Owner? Access Admin Terminal
-          </a>
-        </div>
       </div>
     </div>
   `;
@@ -364,6 +358,10 @@ function renderAdminLoginPage(viewport, redirectData = null) {
           phone: "9415552992",
           role: "admin"
         };
+        if (data.token) {
+          window.state.adminUser.token = data.token;
+          localStorage.setItem("palbasket_admin_token", data.token);
+        }
         window.state.user = null;
         localStorage.setItem("palbasket_admin", JSON.stringify(window.state.adminUser));
         localStorage.removeItem("palbasket_user");
@@ -374,8 +372,8 @@ function renderAdminLoginPage(viewport, redirectData = null) {
         showToast(data.error || "Security Violation: Invalid Admin Credentials!", "danger");
       }
     } catch (err) {
-      // Offline fallback verification
-      const isValid = (username === "admin" || username === "admin@palgrocery.in" || username === "9415552992") && (password === "Pal@9415552992" || password === "admin123" || password === "admin");
+      // Offline fallback verification (Only valid owner phone/email + owner password when API server is offline)
+      const isValid = (username === "admin" || username === "admin@palgrocery.in" || username === "9415552992") && (password === "Pal@9415552992");
       if (isValid) {
         window.state.adminUser = {
           name: "Ramlallu Pal (Owner)",
@@ -387,7 +385,7 @@ function renderAdminLoginPage(viewport, redirectData = null) {
         localStorage.setItem("palbasket_admin", JSON.stringify(window.state.adminUser));
         localStorage.removeItem("palbasket_user");
 
-        showToast("🔑 Security Verification Passed (Offline Mode)!", "success");
+        showToast("🔑 Security Verification Passed (Local Offline Mode)!", "success");
         navigateView("admin", null, false);
       } else {
         showToast("Security Violation: Incorrect Admin ID or Password!", "danger");
@@ -415,16 +413,7 @@ function finalizeAuthSuccess(viewport) {
   updateHeaderAuthUI();
   const redirect = viewport.dataset.redirectTarget || "home";
   
-  const adminToggle = document.getElementById("admin-mode-toggle");
-  if (window.state.adminUser) {
-    if (adminToggle) adminToggle.innerHTML = `<i data-lucide="shopping-bag"></i><span>Customer Shop</span>`;
-    document.getElementById("storefront-nav").style.display = "none";
-    document.getElementById("cart-drawer-toggle").style.display = "none";
-    navigateView("admin");
-  } else {
-    if (adminToggle) adminToggle.innerHTML = `<i data-lucide="layout-dashboard"></i><span>Admin Portal</span>`;
-    document.getElementById("storefront-nav").style.display = "flex";
-    document.getElementById("cart-drawer-toggle").style.display = "flex";
-    navigateView(redirect);
-  }
+  document.getElementById("storefront-nav").style.display = "flex";
+  document.getElementById("cart-drawer-toggle").style.display = "flex";
+  navigateView(redirect);
 }

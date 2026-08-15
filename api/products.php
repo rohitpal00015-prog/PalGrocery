@@ -81,6 +81,7 @@ if ($method === 'GET') {
 
 // ─── POST: Naya product add karo ─────────────────────────
 elseif ($method === 'POST') {
+    verifyAdminAuthToken($db);
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!$data || empty($data['name']) || empty($data['price'])) {
@@ -89,24 +90,22 @@ elseif ($method === 'POST') {
 
     // ID generate karo agar nahi diya
     $id = isset($data['id']) && $data['id'] ? $data['id'] : 'prod-' . time() . '-' . rand(100, 999);
-    $name         = $db->real_escape_string(trim($data['name']));
-    $category     = $db->real_escape_string($data['category'] ?? 'groceries');
+    $name         = trim($data['name']);
+    $category     = $data['category'] ?? 'groceries';
     $price        = floatval($data['price']);
     $discPrice    = isset($data['discountPrice']) && $data['discountPrice'] ? floatval($data['discountPrice']) : null;
     $stock        = intval($data['stock'] ?? 0);
     $expiry       = !empty($data['expiryDate']) ? $data['expiryDate'] : null;
-    $supplier     = $db->real_escape_string($data['supplier'] ?? 'Local Kirana Supplier');
-    $barcode      = $db->real_escape_string($data['barcode'] ?? '');
-    $description  = $db->real_escape_string($data['description'] ?? '');
+    $supplier     = $data['supplier'] ?? 'Local Kirana Supplier';
+    $barcode      = $data['barcode'] ?? '';
+    $description  = $data['description'] ?? '';
     $rating       = floatval($data['rating'] ?? 5.0);
     $reviewsCount = intval($data['reviewsCount'] ?? 0);
-
-    $discSql = $discPrice !== null ? $discPrice : "NULL";
 
     $stmt = $db->prepare("INSERT INTO products (id, name, category, price, discount_price, rating, reviews_count, stock, expiry_date, supplier, barcode, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->bind_param(
-        "sssdddissss",
+        "sssdddisssss",
         $id, $name, $category, $price, $discPrice, $rating, $reviewsCount, $stock, $expiry, $supplier, $barcode, $description
     );
 
@@ -119,6 +118,7 @@ elseif ($method === 'POST') {
 
 // ─── PUT: Product update karo ────────────────────────────
 elseif ($method === 'PUT') {
+    verifyAdminAuthToken($db);
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!$data || empty($data['id'])) {
@@ -126,21 +126,21 @@ elseif ($method === 'PUT') {
     }
 
     $id          = trim($data['id']);
-    $name        = $db->real_escape_string($data['name'] ?? '');
-    $category    = $db->real_escape_string($data['category'] ?? 'groceries');
+    $name        = $data['name'] ?? '';
+    $category    = $data['category'] ?? 'groceries';
     $price       = floatval($data['price'] ?? 0);
     $discPrice   = isset($data['discountPrice']) && $data['discountPrice'] ? floatval($data['discountPrice']) : null;
     $stock       = intval($data['stock'] ?? 0);
     $expiry      = !empty($data['expiryDate']) ? $data['expiryDate'] : null;
-    $supplier    = $db->real_escape_string($data['supplier'] ?? '');
-    $barcode     = $db->real_escape_string($data['barcode'] ?? '');
-    $description = $db->real_escape_string($data['description'] ?? '');
-    $status      = $db->real_escape_string($data['status'] ?? 'active');
+    $supplier    = $data['supplier'] ?? '';
+    $barcode     = $data['barcode'] ?? '';
+    $description = $data['description'] ?? '';
+    $status      = $data['status'] ?? 'active';
 
     $stmt = $db->prepare("UPDATE products SET name=?, category=?, price=?, discount_price=?, stock=?, expiry_date=?, supplier=?, barcode=?, description=?, status=? WHERE id=?");
 
     $stmt->bind_param(
-        "ssddiSssss s",
+        "ssddissssss",
         $name, $category, $price, $discPrice, $stock, $expiry, $supplier, $barcode, $description, $status, $id
     );
 
@@ -169,6 +169,7 @@ elseif ($method === 'PUT') {
 
 // ─── DELETE: Product delete karo ─────────────────────────
 elseif ($method === 'DELETE') {
+    verifyAdminAuthToken($db);
     $id = isset($_GET['id']) ? trim($_GET['id']) : null;
 
     // Body se bhi check karo

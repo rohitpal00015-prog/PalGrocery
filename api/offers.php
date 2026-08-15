@@ -30,6 +30,7 @@ if ($method === 'GET') {
 }
 
 elseif ($method === 'POST') {
+    verifyAdminAuthToken($db);
     $data = json_decode(file_get_contents('php://input'), true);
     if (!$data || !isset($data['offers'])) {
         errorResponse("Offers array zaroori hai");
@@ -56,6 +57,7 @@ elseif ($method === 'POST') {
 }
 
 elseif ($method === 'PUT') {
+    verifyAdminAuthToken($db);
     $data = json_decode(file_get_contents('php://input'), true);
     if (!$data || !isset($data['id'])) {
         errorResponse("Offer ID zaroori hai");

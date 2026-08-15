@@ -13,7 +13,7 @@ class KiranaAdmin {
     viewport.innerHTML = `
       <div class="admin-layout">
         <!-- Sidebar Navigation Menu -->
-        <aside class="admin-sidebar" style="overflow-y: auto; max-height: calc(100vh - 120px);">
+        <aside class="admin-sidebar">
           <!-- Admin User Profile Card -->
           <div class="admin-profile-card" style="padding: var(--spacing-md); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);">
             <div style="background: var(--primary); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1.1rem;">R</div>
@@ -2768,7 +2768,35 @@ class KiranaAdmin {
             </div>
             <div class="form-field">
               <label style="font-weight:700;">Kirana Shop Name (Hindi) *</label>
-              <input type="text" id="setting-shop-name-hi" value="${(window.TRANSLATIONS.hi && window.TRANSLATIONS.hi.shop_name) || '�          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-top: var(--spacing-sm); margin-bottom: var(--spacing-xs); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">3. Store Tagline & Announcement</h3>
+              <input type="text" id="setting-shop-name-hi" value="${(window.TRANSLATIONS.hi && window.TRANSLATIONS.hi.shop_name) || 'पाल ग्रॉसरी'}" required style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label style="font-weight:700;">Store Owner Name *</label>
+              <input type="text" id="setting-owner-name" value="${window.SHOP_CONFIG.ownerName || 'Ramlallu Pal'}" required style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
+            </div>
+            <div class="form-field">
+              <label style="font-weight:700;">WhatsApp / Support Contact *</label>
+              <input type="text" id="setting-phone" value="${window.SHOP_CONFIG.phone || '919415552992'}" required style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-top: var(--spacing-sm); margin-bottom: var(--spacing-xs); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">2. Operating Hours & Delivery</h3>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label style="font-weight:700;">Operating Hours</label>
+              <input type="text" id="setting-hours" value="08:00 AM - 10:00 PM" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
+            </div>
+            <div class="form-field">
+              <label style="font-weight:700;">Delivery Radius (km)</label>
+              <input type="text" id="setting-delivery" value="${window.SHOP_CONFIG.deliveryRange || '3km'}" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-top: var(--spacing-sm); margin-bottom: var(--spacing-xs); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">3. Store Tagline & Announcement</h3>
 
           <div class="form-field">
             <label style="font-weight:700;">Store Tagline (English)</label>
@@ -2790,7 +2818,7 @@ class KiranaAdmin {
             🔐 Admin Security & Bank-Grade Password Protection
           </h3>
           <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: -4px;">
-            यहाँ से आप अपना नया पासवर्ड व यूजरनेम सेट कर सकते हैं। यह जानकारी MySQL डेटाबेस में <strong>Bcrypt Encrpytion</strong> से हमेशा के लिए सुरक्षित रहेगी।
+            यहाँ से आप अपना नया पासवर्ड व यूजरनेम सेट कर सकते हैं। यह जानकारी MySQL डेटाबेस में <strong>Bcrypt Encryption</strong> से हमेशा के लिए सुरक्षित रहेगी।
           </p>
 
           <div class="form-field">
@@ -2830,9 +2858,13 @@ class KiranaAdmin {
     }
 
     try {
+      const token = (window.state && window.state.adminUser && window.state.adminUser.token) || localStorage.getItem("palbasket_admin_token") || "";
       const res = await fetch("api/auth.php?action=change_admin_credentials", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
         body: JSON.stringify({ oldPassword, newUsername, newPassword })
       });
       const data = await res.json();
@@ -2844,35 +2876,8 @@ class KiranaAdmin {
         showToast(data.error || "Failed to update password.", "danger");
       }
     } catch (err) {
-      showToast("Admin credentials updated in Local Security State!", "success");
+      showToast("Admin credentials update failed.", "danger");
     }
-  }bel>
-              <input type="text" id="setting-hours" value="08:00 AM - 10:00 PM" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
-            </div>
-            <div class="form-field">
-              <label style="font-weight:700;">Delivery Radius (km)</label>
-              <input type="text" id="setting-delivery" value="${window.SHOP_CONFIG.deliveryRange || '3km'}" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
-            </div>
-          </div>
-
-          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-top: var(--spacing-sm); margin-bottom: var(--spacing-xs); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">3. Store Tagline & Announcement</h3>
-
-          <div class="form-field">
-            <label style="font-weight:700;">Store Tagline (English)</label>
-            <input type="text" id="setting-tagline-en" value="${(window.TRANSLATIONS.en && window.TRANSLATIONS.en.tagline) || 'Fresh Groceries & Chilled Drinks Delivered Instantly'}" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
-          </div>
-          <div class="form-field">
-            <label style="font-weight:700;">Store Tagline (Hindi)</label>
-            <input type="text" id="setting-tagline-hi" value="${(window.TRANSLATIONS.hi && window.TRANSLATIONS.hi.tagline) || 'ताज़ा राशन और ठंडा कोल्ड-ड्रिंक तुरंत घर पहुंचाएं'}" style="background: var(--bg-base); border: 1px solid var(--border-color); padding: 8px; border-radius: 4px; color: var(--text-main); width: 100%;">
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="margin-top: var(--spacing-md); width: 100%;">
-            <i data-lucide="save"></i> Save All Settings & Sync Live Storefront
-          </button>
-        </form>
-      </div>
-    `;
-    if (window.lucide) window.lucide.createIcons();
   }
 
   saveStoreSettings(e) {

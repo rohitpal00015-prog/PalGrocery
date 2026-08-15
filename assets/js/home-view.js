@@ -60,20 +60,12 @@ function renderCustomerHome(viewport) {
         </div>
         <div class="hero-visuals">
           <div class="hero-visual-card">
-            <img src="assets/img/shop_photo.png" alt="Shop Photo">
-            <div class="hero-visual-card-title">${lang === 'hi' ? 'दुकान की तस्वीर' : 'Shop Photo'}</div>
+            <img src="assets/img/pal_store_exterior.jpg" alt="Pal Store Exterior">
+            <div class="hero-visual-card-title">${lang === 'hi' ? 'मेसर्स पाले स्टोर (मुख्य द्वार)' : 'Pal Store Exterior'}</div>
           </div>
           <div class="hero-visual-card">
-            <img src="assets/img/photo.png" alt="Fresh Produce">
-            <div class="hero-visual-card-title">${lang === 'hi' ? 'ताज़ा राशन' : 'Product Photo'}</div>
-          </div>
-          <div class="hero-visual-card">
-            <img src="assets/img/grocery_basket.png" alt="Grocery Basket Illustration">
-            <div class="hero-visual-card-title">${lang === 'hi' ? 'राशन टोकरी' : 'Grocery Basket'}</div>
-          </div>
-          <div class="hero-visual-card">
-            <img src="assets/img/storefront_image.png" alt="Storefront Image">
-            <div class="hero-visual-card-title">${lang === 'hi' ? 'प्रवेश द्वार' : 'Storefront'}</div>
+            <img src="assets/img/pal_store_counter.jpg" alt="Pal Store Counter">
+            <div class="hero-visual-card-title">${lang === 'hi' ? 'किराना स्टोर काउंटर' : 'Store Counter & Billing'}</div>
           </div>
         </div>
       </section>

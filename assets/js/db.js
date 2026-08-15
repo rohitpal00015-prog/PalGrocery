@@ -9,24 +9,31 @@ const DB = (() => {
   const BASE_URL = (() => {
     const origin = window.location.origin;
     const path = window.location.pathname;
-    // htdocs ke andar ka folder name detect karo
-    const folder = path.split('/')[1] || 'palbasket';
-    // Agar localhost pe hai
-    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-      return `${origin}/${folder}/api`;
+    const parts = path.split('/').filter(p => p.length > 0);
+    let subfolder = '';
+    if (parts.length > 0 && parts[0] !== 'admin' && parts[0] !== 'api' && !parts[0].includes('.')) {
+      subfolder = '/' + parts[0];
     }
-    // Online hosting pe hai
-    return `${origin}/api`;
+    return `${origin}${subfolder}/api`;
   })();
 
   let isOnline = false;
+
+  function _getAuthHeaders() {
+    const token = (window.state && window.state.adminUser && window.state.adminUser.token) || localStorage.getItem('palbasket_admin_token') || '';
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+  }
+
 
   // ─── Initialize: API connection test karo ───────────────
   async function init() {
     try {
       const res = await fetch(`${BASE_URL}/products.php?limit=1`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: _getAuthHeaders()
       });
       if (res.ok) {
         isOnline = true;
@@ -71,7 +78,7 @@ const DB = (() => {
     try {
       const res = await fetch(`${BASE_URL}/products.php`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify(product)
       });
       const data = await res.json();
@@ -98,7 +105,7 @@ const DB = (() => {
     try {
       const res = await fetch(`${BASE_URL}/products.php`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify(product)
       });
       const data = await res.json();
@@ -121,7 +128,8 @@ const DB = (() => {
 
     try {
       const res = await fetch(`${BASE_URL}/products.php?id=${productId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: _getAuthHeaders()
       });
       const data = await res.json();
       if (data.success) {
@@ -145,7 +153,7 @@ const DB = (() => {
       const promises = products.map(p =>
         fetch(`${BASE_URL}/products.php`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: _getAuthHeaders(),
           body: JSON.stringify(p)
         })
       );
@@ -188,7 +196,7 @@ const DB = (() => {
     try {
       const res = await fetch(`${BASE_URL}/offers.php`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify({ offers })
       });
       const data = await res.json();
@@ -245,7 +253,7 @@ const DB = (() => {
     try {
       const res = await fetch(`${BASE_URL}/settings.php`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify(dbSettings)
       });
       const data = await res.json();
@@ -281,7 +289,7 @@ const DB = (() => {
 
       const res = await fetch(`${BASE_URL}/orders.php`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify(body)
       });
       const data = await res.json();
@@ -355,7 +363,7 @@ const DB = (() => {
 
       const res = await fetch(`${BASE_URL}/orders.php`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: _getAuthHeaders(),
         body: JSON.stringify(body)
       });
       const data = await res.json();
