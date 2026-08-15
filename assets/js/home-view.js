@@ -25,38 +25,7 @@ function renderCustomerHome(viewport) {
             </button>
           </div>
 
-          <!-- Floating Levitating Game SVG (No Box Container) -->
-          <div class="hero-floating-svg-trigger" onclick="window.kiranaArcade.openModal()" title="Play Games & Win 25% OFF Coupons!">
-            <div class="hero-svg-glow-ring"></div>
-            <svg viewBox="0 0 100 100" width="68" height="68" class="hero-game-svg-element" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="hero-pad-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#a855f7"/>
-                  <stop offset="50%" stop-color="#7c3aed"/>
-                  <stop offset="100%" stop-color="#4c1d95"/>
-                </linearGradient>
-                <linearGradient id="hero-btn-glow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#fbbf24"/>
-                  <stop offset="100%" stop-color="#ef4444"/>
-                </linearGradient>
-                <filter id="hero-drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#7c3aed" flood-opacity="0.6"/>
-                </filter>
-              </defs>
-              <!-- 3D Levitating Gamepad -->
-              <path d="M 20 35 C 10 35 5 50 12 70 C 18 85 32 82 40 70 L 48 58 L 52 58 L 60 70 C 68 82 82 85 88 70 C 95 50 90 35 80 35 C 65 35 58 45 50 45 C 42 45 35 35 20 35 Z" fill="url(#hero-pad-grad)" stroke="#c084fc" stroke-width="2.5" filter="url(#hero-drop-shadow)"/>
-              <rect x="23" y="48" width="6" height="16" rx="2" fill="#ffffff"/>
-              <rect x="18" y="53" width="16" height="6" rx="2" fill="#ffffff"/>
-              <circle cx="76" cy="49" r="4.5" fill="url(#hero-btn-glow)"/>
-              <circle cx="84" cy="57" r="4.5" fill="url(#hero-btn-glow)"/>
-              <circle cx="68" cy="57" r="4.5" fill="url(#hero-btn-glow)"/>
-              <circle cx="76" cy="65" r="4.5" fill="url(#hero-btn-glow)"/>
-              <ellipse cx="50" cy="42" rx="6" ry="3" fill="#38bdf8"/>
-            </svg>
-            <div class="hero-floating-svg-badge">
-              <i data-lucide="gamepad-2" class="inline-icon"></i> PLAY KIRANA ARCADE!
-            </div>
-          </div>
+
         </div>
         <div class="hero-visuals">
           <div class="hero-visual-card">
